@@ -4,6 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML Intro</title>
+    <style>
+        /* Element selector */
+        h1, #hobbies {
+            color: red;
+            background-color: yellow
+        }
+        
+        /* ID selector */
+        #hobbies {
+            border: 2px solid green;
+        }
+
+        /* Apply to all li elements that are children of #hobbies 
+          (any element of that ID) */
+        #hobbies li {
+            background-color: lightblue;
+        }
+
+        /* Pseudo selector (changes li background when mouse hover over) */
+        li:hover, #hobbies li:hover {
+            background: lightgreen;
+        }
+
+        /* Class selector */
+        .big {
+            font-size: 2em;
+        }
+    </style>
 </head>
 <body>
     <h1>Heading 1</h1>
@@ -12,11 +40,21 @@
     <h4>Heading 4</h4>
     <h5>Heading 5</h5>
     <h6>Heading 6</h6>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, quod, quaerat, quasi, quidem, quibusdam, repellendus, quod, quaerat, quasi.</p>
+    <p class="big">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, quod, quaerat, quasi, quidem, quibusdam, repellendus, quod, quaerat, quasi.</p>
     <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Omnis, ab.</p>
     <img src="https://placekitten.com/300" alt="Cute Kitten Photo">
     <br>
-    <a href="https://google.com/">Go to Google!</a>"
+    <a class="big" href="https://google.com/">Go to Google!</a>
+    <ul id="hobbies">
+        <li>Coding</li>
+        <li>Gaming</li>
+        <li>Reading</li>
+    </ul>
+    <ul>
+        <li>One</li>
+        <li>Two</li>
+        <li>Three</li>
+    </ul>
 
 
 </body>
