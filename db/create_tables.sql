@@ -4,7 +4,7 @@ drop table categories;
 create table categories (
     id serial primary key,
 
-    name varchar(50) not null,
+    name varchar(50) not null unique,
     description text
 );
 
@@ -24,8 +24,17 @@ create table items (
     description text not null,
     category_id integer not null,
 -- How to create a foreign key
-    foreign key (category_id) references categories (id)
+    foreign key (category_id) references categories (id) on delete cascade
 );
+
+insert into items (name, description, category_id) values 
+    ('Skyrim', 'Awesome open-world RPG', 4),
+    ('World of Warcraft', 'Popular MMORPG', 4),
+    ('iPhone', 'Apple''s flagship smartphone', 1),
+    ('Greg Norman golf clubs', 'At least you can look like a pro', 3)
+;
+
+
 
 
 
