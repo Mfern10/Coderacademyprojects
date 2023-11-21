@@ -1,7 +1,9 @@
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 from flask_marshmallow import Marshmallow
+from flask_bcrypt import Bcrypt
+
 
 
 app = Flask(__name__)
@@ -11,6 +13,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameg
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+bcrypt = Bcrypt(app)
+
+
 
 class CardSchema(ma.Schema):
     class Meta:
@@ -26,6 +31,23 @@ class Card(db.Model):
     status = db.Column(db.String(30))
     date_created = db.Column(db.Date())
 
+# creates a model which represents the users
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    email = db.Column(db.String, nullable=False, unique=True)
+    password = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'name', 'email', 'password', 'is_admin')
+
+
+
+
 
 # adds a terminal function to run to create the table
 @app.cli.command('db_create')
@@ -37,6 +59,18 @@ def db_create():
 # creates a terminal function to run that places data into the table
 @app.cli.command('db_seed')
 def db_seed():
+    users = [
+        User(
+            email = 'admin@spam.com',
+            password=bcrypt.generate_password_hash('spinynorman').decode('utf8'),
+            is_admin=True
+        ),
+        User(
+            name='John Cleese',
+            email='cleese@spam.com',
+            password=bcrypt.generate_password_hash('tisbutascratch').decode('utf8'),
+        )
+    ]
     cards= [
         Card(
             title = 'Start the project',
@@ -58,16 +92,37 @@ def db_seed():
         ),
     ]
     # adds the data then commits it to the database will now show in psql database
+    db.session.add_all(users)
     db.session.add_all(cards)
     db.session.commit()
 
     print('Database seeded')
 
 # selects all cards in a function and prints them out as a dictionary
+
+@app.route('/users/register', methods = ['POST'])
+def register():
+    # Parse incoming POST body through the schema
+    user_info = UserSchema(exclude=['id']).load(request.json)
+    # create a new user with the parsed data
+    user = User(
+        email=user_info['email'],
+        password=bcrypt.generate_password_hash(user_info['password']).decode('utf8'),
+        name=user_info.get('name', '')
+    )
+    
+    # Add and commit the new user to the database
+    db.session.add(user)
+    db.session.commit()
+    
+    # Return the new user
+    return UserSchema(exclude=['password']).dump(user), 201
+
+
 @app.route('/cards')
 def all_cards():
     # select * from cards;
-    stmt = db.select(Card).where(db.or_(Card.status != 'Done', Card.id > 2)).order_by(Card.title.desc())
+    stmt = db.select(Card) #.where(db.or_(Card.status != 'Done', Card.id > 2)).order_by(Card.title.desc())
     cards = db.session.scalars(stmt).all()
     return CardSchema(many=True).dump(cards)
 
