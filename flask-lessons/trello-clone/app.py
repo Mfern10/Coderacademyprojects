@@ -1,17 +1,19 @@
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
+from os import environ
+
 
 
 
 app = Flask(__name__)
 
-app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
+app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
 
 # Links the postgres DB and user to the flask application
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@127.0.0.1:5432/trello'
@@ -20,6 +22,21 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
+
+def admin_required():
+    # get users email from the JWT Subject
+    user_email = get_jwt_identity()
+    # Check database for that email address and retrieves it
+    stmt = db.select(User).where(User.email == user_email)
+    # Gets instance of the user model
+    user = db.session.scalar(stmt)
+    # checks if the user is an admin if not returns error if yes continues
+    if not (user and user.is_admin):
+        abort(401)
+
+@app.errorhandler(401)
+def unauthorized(err):
+    return {'error': 'You are not authorized to access this resource'}
 
 
 
@@ -107,7 +124,7 @@ def db_seed():
 def register():
     try:
         # Parse incoming POST body through the schema
-        user_info = UserSchema(exclude=['id']).load(request.json)
+        user_info = UserSchema(exclude=['id', 'is_admin']).load(request.json)
         # create a new user with the parsed data
         user = User(
             email=user_info['email'],
@@ -147,6 +164,7 @@ def login():
 @app.route('/cards')
 @jwt_required()
 def all_cards():
+    admin_required()
     # select * from cards;
     stmt = db.select(Card) #.where(db.or_(Card.status != 'Done', Card.id > 2)).order_by(Card.title.desc())
     cards = db.session.scalars(stmt).all()
