@@ -5,7 +5,7 @@ from setup import db, bcrypt
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token
 
-users_bp = Blueprint('users', __name__, url_prefix='users')
+users_bp = Blueprint('users', __name__, url_prefix='/users')
 
 # selects all cards in a function and prints them out as a dictionary
 @users_bp.route('/register', methods = ['POST'])
