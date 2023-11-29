@@ -28,28 +28,34 @@ def db_seed():
             password=bcrypt.generate_password_hash('tisbutascratch').decode('utf8'),
         )
     ]
+
+    db.session.add_all(users)
+    db.session.commit()
+
     cards= [
         Card(
             title = 'Start the project',
             description = 'Stage 1 - ERD Creation',
             status = 'Done',
-            date_created = date.today()
+            date_created = date.today(),
+            user_id = users[0].id
         ),
         Card(
             title = 'ORM Queries',
             description = 'Stage 2 - Implement CRUD queries',
             status = 'In progress',
-            date_created = date.today()
+            date_created = date.today(),
+            user_id = users[1].id
         ),
         Card(
             title = 'Marshmallow',
             description = 'Stage 3 - Implement JSONify of meodels',
             status = 'In progress',
-            date_created = date.today()
+            date_created = date.today(),
+            user_id = users[0].id
         ),
     ]
     # adds the data then commits it to the database will now show in psql database
-    db.session.add_all(users)
     db.session.add_all(cards)
     db.session.commit()
 

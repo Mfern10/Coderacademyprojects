@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.card import CardSchema, Card
 from setup import db
 from auth import admin_required
@@ -15,7 +15,7 @@ def all_cards():
     # select * from cards;
     stmt = db.select(Card) #.where(db.or_(Card.status != 'Done', Card.id > 2)).order_by(Card.title.desc())
     cards = db.session.scalars(stmt).all()
-    return CardSchema(many=True).dump(cards)
+    return CardSchema(many=True, exclude=['user.cards']).dump(cards)
 
 # get one card
 @cards_bp.route('/<int:id>')
@@ -37,7 +37,9 @@ def create_card():
     card = Card(
         title = card_info['title'],
         description = card_info.get('description', ''),
-        status = card_info.get('status', 'To Do')
+        status = card_info.get('status', 'To Do'),
+        # get the user id from Token and email
+        user_id = get_jwt_identity()
     )
     db.session.add(card)
     db.session.commit()
@@ -60,6 +62,7 @@ def update_card(id):
     else:
         return {'error': 'Card not found'}, 404
     
+# Delete a card
 @cards_bp.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
 def delete_card(id):

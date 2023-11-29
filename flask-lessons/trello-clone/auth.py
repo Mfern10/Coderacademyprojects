@@ -5,9 +5,9 @@ from models.user import User
 
 def admin_required():
     # get users email from the JWT Subject
-    user_email = get_jwt_identity()
+    user_id = get_jwt_identity()
     # Check database for that email address and retrieves it
-    stmt = db.select(User).filter_by(email=user_email)
+    stmt = db.select(User).filter_by(id=user_id)
     # Gets instance of the user model
     user = db.session.scalar(stmt)
     # checks if the user is an admin if not returns error if yes continues
