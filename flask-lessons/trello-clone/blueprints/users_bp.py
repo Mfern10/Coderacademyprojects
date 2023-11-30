@@ -8,7 +8,7 @@ from auth import admin_required
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
-# selects all cards in a function and prints them out as a dictionary
+# selects all comments in a function and prints them out as a dictionary
 @users_bp.route('/register', methods = ['POST'])
 def register():
     try:
@@ -53,8 +53,8 @@ def login():
 @jwt_required()
 def all_users():
     admin_required()
-    # select * from cards;
-    stmt = db.select(User) #.where(db.or_(Card.status != 'Done', Card.id > 2)).order_by(Card.title.desc())
+    # select * from comments;
+    stmt = db.select(User) #.where(db.or_(Comment.status != 'Done', Comment.id > 2)).order_by(Comment.title.desc())
     users = db.session.scalars(stmt).all()
-    print(users[0].cards)
+    print(users[0].comments)
     return UserSchema(many=True, exclude=['password']).dump(users)
