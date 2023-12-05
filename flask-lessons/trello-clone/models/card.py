@@ -1,7 +1,9 @@
 from setup import db, ma
 from datetime import datetime
 from marshmallow import fields
+from marshmallow.validate import OneOf, Regexp, Length, And
 
+VALID_STATUSES = ( 'To Do', 'Done', "In Progress", 'Testing', 'Deployed', 'Cancelled')
 
 
 # creates a model which represents a entity in the database/creates a table in postgres DB trello
@@ -25,6 +27,12 @@ class CardSchema(ma.Schema):
     # Tell Marshmallow to nest a user schema instance when serializing
     user = fields.Nested('UserSchema', exclude=['password']) # Creates a nested field for user 
     comments = fields.Nested('CommentSchema', many=True, exclude=['card'])
+    status = fields.String(validate=OneOf(VALID_STATUSES))
+    # Title must contain only letters, numbers and spaces
+    title = fields.String(required=True, validate=And(
+            Regexp('^[0-9a-zA-Z ]+$', error='Title must contain only letters, numbers and spaces'),
+            Length(min=3, error='Title must be at least 3 characters long')))
+            
 
     class Meta:
         fields = ('id', 'title', 'description', 'status', 'date_created', 'user', 'comments')

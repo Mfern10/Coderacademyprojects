@@ -4,13 +4,15 @@ from models.user import User, UserSchema
 from setup import db, bcrypt
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, jwt_required
-from auth import admin_required
+from auth import authorize
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
 # selects all comments in a function and prints them out as a dictionary
 @users_bp.route('/register', methods = ['POST'])
+@jwt_required()
 def register():
+    authorize() # Admin only 
     try:
         # Parse incoming POST body through the schema
         user_info = UserSchema(exclude=['id', 'is_admin']).load(request.json)
@@ -52,7 +54,7 @@ def login():
 @users_bp.route('/')
 @jwt_required()
 def all_users():
-    admin_required()
+    authorize() # Admin only 
     # select * from comments;
     stmt = db.select(User) #.where(db.or_(Comment.status != 'Done', Comment.id > 2)).order_by(Comment.title.desc())
     users = db.session.scalars(stmt).all()

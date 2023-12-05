@@ -1,15 +1,13 @@
+from flask import abort
 from flask_jwt_extended import get_jwt_identity
-from setup import db
-from os import abort
 from models.user import User
+from setup import db
 
-def admin_required():
-    # get users email from the JWT Subject
-    user_id = get_jwt_identity()
-    # Check database for that email address and retrieves it
-    stmt = db.select(User).filter_by(id=user_id)
-    # Gets instance of the user model
+def authorize(user_id=None):
+    jwt_user_id = get_jwt_identity()
+    stmt = db.select(User).filter_by(id=jwt_user_id)
     user = db.session.scalar(stmt)
-    # checks if the user is an admin if not returns error if yes continues
-    if not (user and user.is_admin):
+    # If it's not the case that the user is an admin or user_id is truthy and matches the token
+    # i.e. if user_id isn't passed in, they must be admin
+    if not (user.is_admin or (user_id and jwt_user_id == user_id)):
         abort(401)
