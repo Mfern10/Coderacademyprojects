@@ -107,11 +107,69 @@
 //   return x + y
 
 // in JS we use:
-function add(x,y) {
-    return x + y
-}
+// function add(x,y) {
+//     return x + y
+// }
 
-console.log(add(10, 34))
+// console.log(add(10, 34))
+
+// const Utils = {
+// // Arrow head function Anonymous function(Can be used with callback function)
+//     add: (x,y) => x + y,
+
+// // if it takes one parameter we can omit the parethethis on paramter
+//     squares: arr => arr.map(x => x ** 2),
+
+// // double number
+//     double: x => x * 2
+
+// // arrowhead functions that can be used for mapping square value to arr
+// }
+
+// // console.log(add(10,34))
+// // console.log(square(10))
+
+// //exmple of mapping
+// const numbers = [12, 50, 44, 32, 2]
+// const result = Utils.double(numbers) // calls back the double function
+// console.log(result) // will double the numbers
+
+
+
+// Destructuring
+
+// const people = ['Matt', 'John', 'Mary', 'Kate']
+
+// // create 2 variables (first and second) First will take first value and second will take second.
+// const [first, second, ...others] = people // ... = rest operator gets the remaining values and puts in Array
+
+// console.log(first, second, others)
+
+
+// concatenation of lists
+// const bobBirds = ['Robin', 'Crow']
+// const sallyBirds = ['Bluejay', 'Cardinal']
+
+// // concats the two lists together, using concat you can't add extra elements
+// // const allBirds = bobBirds.concat(sallyBirds)
+
+// // new list of 4 elements from both lists and expand into one list , using this method you can add extra elements
+// const allBirds = [...bobBirds, ...sallyBirds, 'Kookaburra']
+
+// console.log(allBirds)
+
+// // ... has destructured the array into its elements(expansion operator)
+// console.log(bobBirds)
+
+
+// creates and object then expands that object in new object and force changes the change of favourite color.
+const me = { name: 'Mitch', age: 29, favouriteColor: 'purple'}
+const me2 = { ...me, favouriteColor: 'red'}
+
+console.log(me)
+console.log(me2)
+
+
 
 
 
