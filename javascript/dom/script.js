@@ -21,20 +21,18 @@
 // newDiv.id = 'spam'
 // newDiv.style.color = 'blue'
 
-
 //const myColor = 'blue'
 //document.body.innerHTML += `<div id="spam" style="color: ${myColor}"><h3>Awesome content!</h3></div>`
 
-
-// Dynamically generate the list items so they are generated through JS 
+// Dynamically generate the list items so they are generated through JS
 const items = [
-'Adding to the DOM',
-'Querying the DOM',
-'Changing the DOM',
-'Event listeners'
-]
+  "Adding to the DOM",
+  "Querying the DOM",
+  "Changing the DOM",
+  "Event listeners",
+];
 
-const ul = document.querySelector('ul')
+const ul = document.querySelector("ul");
 
 // for (let item of items) {
 //     const newLi = document.createElement('li')
@@ -46,6 +44,21 @@ const ul = document.querySelector('ul')
 //     ul.innerHTML += `<li>${item}</li>`
 // }
 
+const lis = items.map((item) => `<li>${item}</li>`);
+ul.innerHTML += lis.join("");
 
-const lis = items.map(item => `<li>${item}</li>`)
-ul.innerHTML += lis.join("")
+// Manipulating the DOM when an event happens event listeners. Event driven programming.
+
+// Handle a mouse click on the H1 element.
+// document
+//   .querySelector("h1")
+//   .addEventListener("click", (event) => (event.target.innerText += "!"));
+
+// reference to input
+const newItem = document.querySelector('#newItem')
+// reference to button
+const btn = document.querySelector('button')
+btn.addEventListener("click", () => (ul.innerHTML += `<li>${newItem.value}</li>`))
+newItem.value = ''
+
+
