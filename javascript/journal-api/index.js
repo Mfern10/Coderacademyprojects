@@ -1,4 +1,6 @@
 import express from "express";
+import mongoose from "mongoose";
+import DB_URI from "./"
 
 const categories = ["Food", "Gaming", "Coding", "Other"];
 
@@ -7,6 +9,29 @@ const entries = [
   { category: "Gaming", content: "Skyrim is for the Nords" },
   { category: "Coding", content: "Coding is fun!" },
 ];
+
+// opened connection via mongoose, connection string from atlas and add Db name after .net/
+// add then and catch errors.
+mongoose
+  .connect(DB_URI
+  )
+  .then((mc) =>
+    console.log(
+      mc.connection.readyState === 1
+        ? "MongoDB connected!"
+        : "MongoDB failed to connect!"
+    )
+  )
+  .catch((err) => console.log(err));
+
+// creates schema for the entries in database
+const entriesSchema = new mongoose.Schema({
+  category: { type: String, required: true },
+  content: { type: String, required: true },
+});
+
+// creates model for the entries schema
+const EntryModel = mongoose.model("Entry", entriesSchema);
 
 const app = express();
 
@@ -28,22 +53,25 @@ app.get("/entries/:id", (req, res) => {
   if (entry) {
     res.send(entry);
   } else {
-    res.status(404).send({error: 'Entry not found'})
+    res.status(404).send({ error: "Entry not found" });
   }
 });
 
-
-
 // create post for entries route
-app.post("/entries", (req, res) => {
-  // Get the entry data from the request
-  console.log(req.body);
-  // TODO: Make sure its in correct format(Validate)
-  // Create new entry object
-  // Push new entry to the array
-  entries.push(req.body);
-  // Respond with a 201 and the created entry
-  res.status(201).send(entries[entries.length - 1]);
+app.post("/entries", async (req, res) => {
+  try {
+    // Get the entry data from the request
+    // console.log(req.body);
+    // TODO: Make sure its in correct format(Validate)
+    // Create new entry object
+    // Push new entry to the array
+    // entries.push(req.body);
+    const insertedEntry = await EntryModel.create(req.body);
+    // Respond with a 201 and the created entry
+    res.status(201).send(insertedEntry);
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+  }
 });
 
 app.listen(4001, () => {
