@@ -32,6 +32,8 @@ app.get("/entries/:id", (req, res) => {
   }
 });
 
+
+
 // create post for entries route
 app.post("/entries", (req, res) => {
   // Get the entry data from the request
