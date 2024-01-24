@@ -1,40 +1,7 @@
 import express from "express";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+import { EntryModel, CategoryModel } from "./db.js";
 
-dotenv.config();
 const categories = ["Food", "Gaming", "Coding", "Other"];
-
-const entries = [
-  { category: "Food", content: "Pizza is yummy!" },
-  { category: "Gaming", content: "Skyrim is for the Nords" },
-  { category: "Coding", content: "Coding is fun!" },
-];
-
-// opened connection via mongoose, connection string from atlas and add Db name after .net/
-// add then and catch errors.
-mongoose
-  .connect(process.env.DB_URI)
-  .then((mc) =>
-    console.log(
-      mc.connection.readyState === 1
-        ? "MongoDB connected!"
-        : "MongoDB failed to connect!"
-    )
-  )
-  .catch((err) => console.log(err));
-
-// when you do ctrl - c it disconnects mongoose connection
-process.on("SIGTERM", () => mongoose.disconnect());
-
-// creates schema for the entries in database
-const entriesSchema = new mongoose.Schema({
-  category: { type: String, required: true },
-  content: { type: String, required: true },
-});
-
-// creates model for the entries schema
-const EntryModel = mongoose.model("Entry", entriesSchema);
 
 const app = express();
 
@@ -45,18 +12,22 @@ app.use(express.json());
 app.get("/", (req, res) => res.send({ info: "Journal API" })); // sends response as JSON
 
 // creates route to fetch categories
-app.get("/categories", (req, res) => res.status(201).send(categories));
+app.get("/categories", async (req, res) =>
+  res.status(201).send(await CategoryModel.find())
+);
 
 // creats a route to fetch  all entries
-app.get("/entries", async (req, res) => res.status(200).send(await EntryModel.find()));
+app.get("/entries", async (req, res) =>
+  res.status(200).send(await EntryModel.find())
+);
 
 // Get one entry
-app.get("/entries/:id", (req, res) => {
-  const entry = entries[req.params.id - 1];
+app.get("/entries/:id", async (req, res) => {
+  const entry = await EntryModel.findById(req.params.id);
   if (entry) {
-    res.send(entry);
+    res.send(entry); // send back a json object
   } else {
-    res.status(404).send({ error: "Entry not found" });
+    res.status(404).send({ error: "Entry not found" }); // send back a json object
   }
 });
 
@@ -77,6 +48,36 @@ app.post("/entries", async (req, res) => {
   }
 });
 
-app.listen(4001, () => {
+app.put("/entries/:id", async (req, res) => {
+  try {
+    const updatedEntry = await EntryModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (updatedEntry) {
+      res.send(updatedEntry);
+    } else {
+      res.status(404).send({ error: err.message });
+    }
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+  }
+});
+
+app.delete("/entries/:id", async (req, res) => {
+  try {
+    const deletedEntry = await EntryModel.findByIdAndDelete(req.params.id);
+    if (deletedEntry) {
+      res.sendStatus(204);
+    } else {
+      res.status(404).send({ error: "Entry not found" });
+    }
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+  }
+});
+
+app.listen(4002, () => {
   console.log("Server is running on http://127.0.0.1:4001");
 });
