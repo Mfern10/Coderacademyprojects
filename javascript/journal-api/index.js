@@ -1,7 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
-import DB_URI from "./"
+import dotenv from "dotenv";
 
+dotenv.config();
 const categories = ["Food", "Gaming", "Coding", "Other"];
 
 const entries = [
@@ -13,8 +14,7 @@ const entries = [
 // opened connection via mongoose, connection string from atlas and add Db name after .net/
 // add then and catch errors.
 mongoose
-  .connect(DB_URI
-  )
+  .connect(process.env.DB_URI)
   .then((mc) =>
     console.log(
       mc.connection.readyState === 1
@@ -23,6 +23,9 @@ mongoose
     )
   )
   .catch((err) => console.log(err));
+
+// when you do ctrl - c it disconnects mongoose connection
+process.on("SIGTERM", () => mongoose.disconnect());
 
 // creates schema for the entries in database
 const entriesSchema = new mongoose.Schema({
@@ -45,7 +48,7 @@ app.get("/", (req, res) => res.send({ info: "Journal API" })); // sends response
 app.get("/categories", (req, res) => res.status(201).send(categories));
 
 // creats a route to fetch  all entries
-app.get("/entries", (req, res) => res.status(200).send(entries));
+app.get("/entries", async (req, res) => res.status(200).send(await EntryModel.find()));
 
 // Get one entry
 app.get("/entries/:id", (req, res) => {
