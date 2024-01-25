@@ -1,12 +1,33 @@
-import { closeConnection, EntryModel } from "./db.js";
+import { closeConnection, EntryModel, CategoryModel } from "./db.js";
 
-const entries = [
-  { category: "Food", content: "Pizza is yummy!" },
-  { category: "Gaming", content: "Skyrim is for the Nords" },
-  { category: "Coding", content: "Coding is fun!" },
+const categories = [
+  {
+    name: "Food",
+  },
+  {
+    name: "Gaming",
+  },
+  {
+    name: "Coding",
+  },
+  {
+    name: "Other",
+  },
 ];
 
-// deletes all entries when seeded
+await CategoryModel.deleteMany();
+console.log("Deleted categories");
+
+const cats = await CategoryModel.insertMany(categories);
+console.log("Added categories");
+
+const entries = [
+  { category: cats[0], content: "Pizza is yummy!" },
+  { category: cats[2], content: "Skyrim is for the Nords" },
+  { category: cats[1], content: "Coding is fun!" },
+];
+
+// // deletes all entries when seeded
 await EntryModel.deleteMany();
 console.log("Deleted entries");
 

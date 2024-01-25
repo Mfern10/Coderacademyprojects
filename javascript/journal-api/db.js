@@ -32,7 +32,7 @@ const CategoryModel = mongoose.model("Category", categoriesSchema);
 
 // creates schema for the entries in database
 const entriesSchema = new mongoose.Schema({
-  category: { type: String, required: true },
+  category: { type: mongoose.ObjectId, ref: 'Category'}, // links the relationship to category 
   content: { type: String, required: true },
 });
 
