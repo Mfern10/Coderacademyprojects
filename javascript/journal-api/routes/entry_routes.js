@@ -21,7 +21,7 @@ router.get("/:id", async (req, res) => {
 // create post for entries route
 router.post("/", async (req, res) => {
   try {
-    const insertedEntry = (await EntryModel.create(req.body)).populate(
+    const insertedEntry = await (await EntryModel.create(req.body)).populate(
       "category"
     );
     // Respond with a 201 and the created entry
