@@ -1,13 +1,18 @@
 import express from "express";
 import categoryRoutes from "./routes/category_routes.js";
 import entryRoutes from "./routes/entry_routes.js";
+import cors from 'cors';
 
 const app = express();
+
+// allows access to certain origins
+app.use(cors());
 
 // connect entry router
 
 // use lets us use the middlewear makes sure items come through as JSON
 app.use(express.json());
+
 
 // creating a route in express. HTTP METHODS ARE USED AFTER DOT
 app.get("/", (req, res) => res.send({ info: "Journal API" })); // sends response as JSON
@@ -21,5 +26,5 @@ app.use("/categories", categoryRoutes);
 app.use("/entries", entryRoutes);
 
 app.listen(4002, () => {
-  console.log("Server is running on http://127.0.0.1:4001");
+  console.log("Server is running on http://127.0.0.1:4002");
 });
