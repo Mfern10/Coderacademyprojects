@@ -1,23 +1,27 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const NewEntry = ({ categories, addEntry }) => {
   const params = useParams();
   const [entry, setEntry] = useState("");
+  const nav = useNavigate();
 
-  function createEntry(e) {
+  async function createEntry(e) {
     e.preventDefault();
     // Create a new entry
-    addEntry(params.cat_id, entry);
+    const id = await addEntry(params.cat_id, entry);
     // 3. Clear input textarea
     setEntry("");
+    // 4. Redirect the browser to the new entry
+    nav(`/entry/${id}`);
   }
+
   return (
     <>
-      <h3>New entry in category {categories[params.cat_id]}</h3>
+      <h3>New entry in category {categories[params.cat_id]?.name}</h3>
       <form className="section" onSubmit={createEntry}>
         <div className="field">
-          <label className="label">Journal Entry</label>
+          <label className="label">Content</label>
           <div className="control">
             <textarea
               className="textarea"

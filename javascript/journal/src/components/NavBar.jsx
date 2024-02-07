@@ -11,7 +11,7 @@ const NavBar = () => {
 
   return (
     <nav
-      className="has-background-info-light"
+      className="navbar has-background-info-light"
       role="navigation"
       aria-label="main navigation"
     >
@@ -44,7 +44,6 @@ const NavBar = () => {
           <Link to="/" className="navbar-item">
             Home
           </Link>
-
           <Link to="/category" className="navbar-item">
             Create Entry
           </Link>
